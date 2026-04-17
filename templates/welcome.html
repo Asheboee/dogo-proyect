@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <title>CheemsBank</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Favicon del sitio -->
+    <link rel="shortcut icon" href="{{ url_for('static', filename='images/site/favicon.png') }}">
+
+    <!-- Estilos del tema (Bootstrap + íconos + app) -->
+    <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet" />
+    <link href="{{ url_for('static', filename='css/icons.min.css') }}" rel="stylesheet" />
+    <link href="{{ url_for('static', filename='css/app.min.css') }}" rel="stylesheet" />
+</head>
+
+<body data-sidebar="dark" data-sidebar-size="small">
+
+<div id="layout-wrapper">
+
+    <!-- ==================== HEADER / BARRA SUPERIOR ==================== -->
+    <header id="page-topbar">
+        <div class="navbar-header">
+
+            <!-- Lado izquierdo: logo + botón para colapsar sidebar -->
+            <div class="d-flex">
+                <div class="navbar-brand-box">
+                    <a href="#" class="logo logo-light">
+                        <img src="{{ url_for('static', filename='images/site/cheems_bank_logo.png') }}" height="60">
+                    </a>
+                </div>
+                <button type="button" class="btn btn-sm px-3" id="vertical-menu-btn">
+                    <i class="fa fa-bars"></i>
+                </button>
+            </div>
+
+            <!-- Lado derecho: nombre del usuario + dropdown con opción de cerrar sesión -->
+            <div class="d-flex">
+                <div class="dropdown d-inline-block">
+                    <button class="btn header-item" data-bs-toggle="dropdown">
+                        <img class="rounded-circle header-profile-user"
+                             src="{{ url_for('static', filename='images/users/default.png') }}">
+                        <span class="ms-1">{{ current_user.name }}</span>
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-end">
+                        <a class="dropdown-item text-danger" href="{{ url_for('logout') }}">
+                            Cerrar sesión
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </header>
+    <!-- ==================== FIN HEADER ==================== -->
+
+
+    <!-- ==================== SIDEBAR / MENÚ LATERAL ==================== -->
+    <div class="vertical-menu">
+        <div data-simplebar class="h-100">
+            <div id="sidebar-menu">
+                <ul class="metismenu list-unstyled" id="side-menu">
+
+                    <li class="menu-title">Categoría 1</li>
+
+                    <!-- Menú con submenú desplegable -->
+                    <li>
+                        <a href="javascript: void(0);" class="has-arrow">
+                            <i class="bx bx-home-circle"></i>
+                            <span>Inicio</span>
+                        </a>
+                        <ul class="sub-menu">
+                            <li><a href="#">Opción 1</a></li>
+                            <li><a href="#">Opción 2</a></li>
+                            <li><a href="#">Opción 3</a></li>
+                        </ul>
+                    </li>
+
+                    <li class="menu-title">Categoría 2</li>
+
+                    <li>
+                        <a href="javascript: void(0);" class="has-arrow">
+                            <i class="bx bx-calendar"></i>
+                            <span>Menú 1</span>
+                        </a>
+                        <ul class="sub-menu">
+                            <li><a href="#">Opción 1</a></li>
+                            <li><a href="#">Opción 2</a></li>
+                        </ul>
+                    </li>
+
+                    <li>
+                        <a href="#">
+                            <i class="bx bx-chat"></i>
+                            <span>Menú 2</span>
+                        </a>
+                    </li>
+
+                </ul>
+            </div>
+        </div>
+    </div>
+    <!-- ==================== FIN SIDEBAR ==================== -->
+
+
+    <!-- ==================== CONTENIDO PRINCIPAL ==================== -->
+    <div class="main-content">
+        <div class="page-content">
+            <div class="container-fluid">
+
+                <!-- Título de la sección -->
+                <div class="row mb-3">
+                    <div class="col-12">
+                        <h4 class="mb-0">MOVIMIENTOS DE CUENTA</h4>
+                    </div>
+                </div>
+
+                <!-- ---- Condicional: solo muestra datos si el usuario tiene cuenta ---- -->
+                {% if account %}
+
+                <!-- Fila principal: tarjeta de perfil (izquierda) + tabla de movimientos (derecha) -->
+                <div class="row">
+
+                    <!-- ===== TARJETA DE PERFIL DEL USUARIO ===== -->
+                    <div class="col-md-3">
+                        <div class="card" style="background-color: #d0e4f7;">
+                            <div class="card-body text-center">
+
+                                <!-- Nombre y etiqueta de panel -->
+                                <p class="fw-bold mb-0" style="color: #1a5fa8;">Bienvenido</p>
+                                <p class="text-muted small mb-3">Panel principal</p>
+
+                                <!-- Avatar del usuario -->
+                                <img src="{{ url_for('static', filename='images/users/default.png') }}"
+                                     class="rounded-circle mb-3"
+                                     width="70" height="70"
+                                     alt="Avatar">
+
+                                <!-- Nombre del usuario (viene de Flask-Login) -->
+                                <h6 class="mb-1">{{ current_user.name }}</h6>
+
+                                <!-- Número de cuenta bancaria -->
+                                <p class="text-muted small mb-0">Cuenta {{ account.number }}</p>
+
+                            </div>
+                        </div>
+
+                        <!-- ===== BALANCE ACTUAL ===== -->
+                        <div class="card mt-3">
+                            <div class="card-body">
+                                <p class="text-muted small mb-1">Balance actual</p>
+                                <!-- Muestra en verde si es positivo, rojo si es negativo -->
+                                <h4 class="{% if balance >= 0 %}text-success{% else %}text-danger{% endif %} mb-0">
+                                    ${{ "%.2f"|format(balance) }}
+                                </h4>
+                            </div>
+                        </div>
+
+                    </div>
+                    <!-- ===== FIN TARJETA PERFIL ===== -->
+
+
+                    <!-- ===== TABLA DE MOVIMIENTOS RECIENTES ===== -->
+                    <div class="col-md-9">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title mb-3">Últimos movimientos</h5>
+
+                                <!-- Solo muestra la tabla si hay transacciones registradas -->
+                                {% if transactions %}
+                                <div class="table-responsive">
+                                    <table class="table table-hover align-middle mb-0">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>Fecha</th>
+                                                <th>Descripción</th>
+                                                <th>Monto</th>
+                                                <th>Tipo</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <!-- Iteramos cada transacción enviada desde app.py -->
+                                            {% for t in transactions %}
+                                            <tr>
+                                                <!-- Fecha formateada: si es objeto date/datetime, usamos strftime -->
+                                                <td class="text-muted small">
+                                                    {{ t.date.strftime('%Y/%m/%d') if t.date else '—' }}
+                                                </td>
+
+                                                <!-- Descripción de la transacción -->
+                                                <td>{{ t.description }}</td>
+
+                                                <!-- Monto: verde para ingresos, rojo para egresos -->
+                                                <td class="fw-semibold {% if t.type == 1 %}text-success{% else %}text-danger{% endif %}">
+                                                    {% if t.type == 1 %}+{% else %}−{% endif %}
+                                                    ${{ "%.2f"|format(t.amount) }}
+                                                </td>
+
+                                                <!-- Badge de tipo: Ingreso (verde) o Egreso (rojo) -->
+                                                <td>
+                                                    {% if t.type == 1 %}
+                                                        <span class="badge bg-success">Ingreso</span>
+                                                    {% else %}
+                                                        <span class="badge bg-danger">Egreso</span>
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                {% else %}
+                                <!-- Mensaje cuando no hay movimientos aún -->
+                                <p class="text-muted mb-0">No hay movimientos registrados aún.</p>
+                                {% endif %}
+
+                            </div>
+                        </div>
+                    </div>
+                    <!-- ===== FIN TABLA DE MOVIMIENTOS ===== -->
+
+                </div>
+
+                {% else %}
+
+                <!-- ===== SIN CUENTA ASOCIADA ===== -->
+                <!-- Se muestra si el usuario no tiene ninguna cuenta en la BD -->
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <p class="text-muted mb-0">No tienes una cuenta bancaria asociada aún.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {% endif %}
+                <!-- ---- Fin condicional de cuenta ---- -->
+
+            </div>
+        </div>
+
+        <!-- ==================== FOOTER ==================== -->
+        <footer class="footer text-center mt-4">
+            <small>CheemsBank - Desarrollado por Asheboe</small>
+        </footer>
+
+    </div>
+    <!-- ==================== FIN CONTENIDO PRINCIPAL ==================== -->
+
+</div>
+
+<!-- ==================== SCRIPTS ==================== -->
+<!-- Orden importante: jQuery primero, luego Bootstrap, luego plugins -->
+<script src="{{ url_for('static', filename='libs/jquery/jquery.min.js') }}"></script>
+<script src="{{ url_for('static', filename='libs/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+<script src="{{ url_for('static', filename='libs/metismenu/metisMenu.min.js') }}"></script>
+<script src="{{ url_for('static', filename='libs/simplebar/simplebar.min.js') }}"></script>
+<script src="{{ url_for('static', filename='libs/node-waves/waves.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+
+</body>
+</html>
