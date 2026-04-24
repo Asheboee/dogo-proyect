@@ -1,20 +1,21 @@
 from persistence.db import get_connection
+from datetime import datetime
+from enums.transaction_type import TransactionType
 import pymysql
 
-class Transaction:
-    def __init__(self, id: int, description: str, date, amount: float, type: int, id_account: int):
+class Transaction ():
+    #def __init__(self, id: int, description: str, date, amount: float, type: int, id_account: int):
+    def __init__(self, id: int, description: str, date: datetime, amount: float, type: TransactionType):
         self.id = id
         self.description = description
         self.date = date
         self.amount = amount
         self.type = type  # 1 Ingreso - 2 Egreso
-        self.id_account = id_account
 
+
+    # Obtiene el historial de transacciones de una cuenta especificada por su id
     @staticmethod
-    def get_by_account(id_account):
-        """
-        Obtiene el historial de transacciones de una cuenta especificada por su id
-        """
+    def get_transactions_by_account(id_account):
         try:
             connection = get_connection()
             cursor = connection.cursor(pymysql.cursors.DictCursor)
@@ -32,8 +33,7 @@ class Transaction:
                     row["description"], 
                     row["date"], 
                     row["amount"], 
-                    row["type"], 
-                    row["id_account"]
+                    row["type"]
                 ))
             
             cursor.close()
@@ -42,23 +42,3 @@ class Transaction:
         except Exception as ex:
             print(f"Error retrieving transactions: {ex}")
             return []
-
-    @staticmethod
-    def save(description, amount, type, id_account):
-        """
-        Registra una nueva transaccion en la base de datos
-        """
-        try:
-            connection = get_connection()
-            cursor = connection.cursor()
-
-            sql = "INSERT INTO transaction (description, amount, type, id_account, date) VALUES (%s, %s, %s, %s, NOW())"
-            cursor.execute(sql, (description, amount, type, id_account))
-            
-            connection.commit()
-            cursor.close()
-            connection.close()
-            return True
-        except Exception as ex:
-            print(f"Error saving transaction: {ex}")
-            return False

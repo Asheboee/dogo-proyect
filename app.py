@@ -1,10 +1,14 @@
 from flask import Flask, render_template, request, jsonify, redirect, url_for
+from entities.accont import Account
+from entities.log import Log
 from entities.user import User
-from entities.account import Account
 from entities.transaction import Transaction
-from flask_login import LoginManager, login_user, login_required, logout_user, current_user
+from flask_login import LoginManager, current_user, login_user, login_required, logout_user
 from dotenv import load_dotenv
 import os
+from decimal import Decimal
+
+from enums.log_type import LogType
 
 load_dotenv()
 
@@ -16,8 +20,8 @@ login_manager.init_app(app)
 login_manager.login_view = "index"
 
 @login_manager.user_loader
-def load_user(user_id):
-    return User.get_by_id(user_id)
+def load_user(id_user):
+    return User.get_by_id(id_user)
 
 @app.route('/')
 def index():
@@ -27,23 +31,12 @@ def index():
 def signup():
     return render_template("signup.html")
 
-@app.route('/welcome')
+@app.route('/welcome', methods=["GET"])
 @login_required
 def welcome():
-    account = Account.get_by_user_id(current_user.id)
-    balance = 0.0
-    transactions = []
-
-    if account:
-        balance = Account.get_balance(account.id)
-        transactions = Transaction.get_by_account(account.id)
-
-    return render_template(
-        'welcome.html',
-        account=account,
-        balance=balance,
-        transactions=transactions
-    )
+    account = Account.get_account_by_user(current_user.id)
+    balance = Account.calculate_balance(account)
+    return render_template("welcome.html", account = account, balance = balance)
 
 @app.route('/api/users', methods=["POST"])
 def create_user():
@@ -72,6 +65,10 @@ def login():
     if user:
 
         login_user(user)
+
+        # Guardar el log de inicio de sesion
+        Log.save_log(user, "Inicio de sesion", LogType.LOGIN)
+        
         return jsonify({
             "success": True,
             "message": "Sesión iniciada correctamente"
@@ -82,12 +79,22 @@ def login():
             "message": "Los datos de acceso ingresados no son correctos."
         }), 401
 
+
+
 @app.route("/logout")
 @login_required
 def logout():
     logout_user()
     return redirect(url_for("index"))
 
+"""@app.route("/api/welcome", methods=["GET"])
+@login_required
+def check_account():
+    user_id = int(request.cookies.get("id"))
+    has_account = Account.check_account(user_id)
+
+    return jsonify({"has_account": has_account}), 200
+"""
 
 
 if __name__ == '__main__':

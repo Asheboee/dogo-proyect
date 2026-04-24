@@ -1,15 +1,22 @@
 from persistence.db import get_connection
 from werkzeug.security import generate_password_hash, check_password_hash
+from enums.profile import Profile
 import pymysql
 from flask_login import UserMixin
 
 class User (UserMixin):
-    def __init__(self, id: int, name:str, email:str, password:str):
+    def __init__(self, id: int, name: str, email: str, password: str, profile: Profile,
+                permissions: list, is_active: bool):
         self.id= id
         self.name = name
         self.email = email
         self.password = password
+        self.profile = profile
+        self.permissions = permissions
+        self.is_active = is_active
     
+
+    # Metodo para verificar si el correo ya se encuentra registrado en la base de datos
     def check_email_exists(email) -> bool:
         """
             Verifica si la cuenta de correo electrónico ya se encuentra registrada.
@@ -32,6 +39,7 @@ class User (UserMixin):
         return row is not None
     
         
+    # Metodo para guardar un nuevo usuario en la base de datos
     def save(name: str, email:str, password:str) -> bool:
         """
             Guarda un registro de usuario en la base de datos
@@ -60,6 +68,8 @@ class User (UserMixin):
             print(f"Error saving user:{ex}")
             return False
         
+
+    # Metodo para verificar las credenciales de inicio de sesión
     def check_login(email, password):
         try:
             connection = get_connection()
@@ -87,6 +97,8 @@ class User (UserMixin):
             print(f"Error login user:{ex}")
             return False
         
+
+    # Metodo para obtener un usuario por su ID
     def get_by_id(id):
             try:
                 connection = get_connection()

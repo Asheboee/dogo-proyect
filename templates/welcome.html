@@ -1,265 +1,216 @@
 <!doctype html>
 <html lang="es">
-<head>
-    <meta charset="utf-8" />
-    <title>CheemsBank</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <head> 
+        <meta charset="utf-8" />
+        <title>CheemsBank</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta content="El banco preferido por los mexicanos" name="description" />
+        <meta content="Asheboe" name="author" />
+ 
+        <link rel="shortcut icon" href="{{ url_for('static', filename='images/site/favicon.png') }}">
+        <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" id="bootstrap-style" rel="stylesheet" type="text/css" />
+            <link href="{{ url_for('static', filename='css/icons.min.css') }}" rel="stylesheet" type="text/css" />
+            <link href="{{ url_for('static', filename='css/app.min.css') }}" id="app-style" rel="stylesheet" type="text/css" />
+            <script src="{{ url_for('static', filename='js/plugin.js') }}"></script>
+        </head>
 
-    <!-- Favicon del sitio -->
-    <link rel="shortcut icon" href="{{ url_for('static', filename='images/site/favicon.png') }}">
+        <body data-sidebar="dark" data-sidebar-size="small">
 
-    <!-- Estilos del tema (Bootstrap + íconos + app) -->
-    <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet" />
-    <link href="{{ url_for('static', filename='css/icons.min.css') }}" rel="stylesheet" />
-    <link href="{{ url_for('static', filename='css/app.min.css') }}" rel="stylesheet" />
-</head>
+            <div id="layout-wrapper">
 
-<body data-sidebar="dark" data-sidebar-size="small">
-
-<div id="layout-wrapper">
-
-    <!-- ==================== HEADER / BARRA SUPERIOR ==================== -->
-    <header id="page-topbar">
-        <div class="navbar-header">
-
-            <!-- Lado izquierdo: logo + botón para colapsar sidebar -->
-            <div class="d-flex">
-                <div class="navbar-brand-box">
-                    <a href="#" class="logo logo-light">
-                        <img src="{{ url_for('static', filename='images/site/cheems_bank_logo.png') }}" height="60">
-                    </a>
-                </div>
-                <button type="button" class="btn btn-sm px-3" id="vertical-menu-btn">
-                    <i class="fa fa-bars"></i>
-                </button>
-            </div>
-
-            <!-- Lado derecho: nombre del usuario + dropdown con opción de cerrar sesión -->
-            <div class="d-flex">
-                <div class="dropdown d-inline-block">
-                    <button class="btn header-item" data-bs-toggle="dropdown">
-                        <img class="rounded-circle header-profile-user"
-                             src="{{ url_for('static', filename='images/users/default.png') }}">
-                        <span class="ms-1">{{ current_user.name }}</span>
-                    </button>
-                    <div class="dropdown-menu dropdown-menu-end">
-                        <a class="dropdown-item text-danger" href="{{ url_for('logout') }}">
-                            Cerrar sesión
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-    </header>
-    <!-- ==================== FIN HEADER ==================== -->
-
-
-    <!-- ==================== SIDEBAR / MENÚ LATERAL ==================== -->
-    <div class="vertical-menu">
-        <div data-simplebar class="h-100">
-            <div id="sidebar-menu">
-                <ul class="metismenu list-unstyled" id="side-menu">
-
-                    <li class="menu-title">Categoría 1</li>
-
-                    <!-- Menú con submenú desplegable -->
-                    <li>
-                        <a href="javascript: void(0);" class="has-arrow">
-                            <i class="bx bx-home-circle"></i>
-                            <span>Inicio</span>
-                        </a>
-                        <ul class="sub-menu">
-                            <li><a href="#">Opción 1</a></li>
-                            <li><a href="#">Opción 2</a></li>
-                            <li><a href="#">Opción 3</a></li>
-                        </ul>
-                    </li>
-
-                    <li class="menu-title">Categoría 2</li>
-
-                    <li>
-                        <a href="javascript: void(0);" class="has-arrow">
-                            <i class="bx bx-calendar"></i>
-                            <span>Menú 1</span>
-                        </a>
-                        <ul class="sub-menu">
-                            <li><a href="#">Opción 1</a></li>
-                            <li><a href="#">Opción 2</a></li>
-                        </ul>
-                    </li>
-
-                    <li>
-                        <a href="#">
-                            <i class="bx bx-chat"></i>
-                            <span>Menú 2</span>
-                        </a>
-                    </li>
-
-                </ul>
-            </div>
-        </div>
-    </div>
-    <!-- ==================== FIN SIDEBAR ==================== -->
-
-
-    <!-- ==================== CONTENIDO PRINCIPAL ==================== -->
-    <div class="main-content">
-        <div class="page-content">
-            <div class="container-fluid">
-
-                <!-- Título de la sección -->
-                <div class="row mb-3">
-                    <div class="col-12">
-                        <h4 class="mb-0">MOVIMIENTOS DE CUENTA</h4>
-                    </div>
-                </div>
-
-                <!-- ---- Condicional: solo muestra datos si el usuario tiene cuenta ---- -->
-                {% if account %}
-
-                <!-- Fila principal: tarjeta de perfil (izquierda) + tabla de movimientos (derecha) -->
-                <div class="row">
-
-                    <!-- ===== TARJETA DE PERFIL DEL USUARIO ===== -->
-                    <div class="col-md-3">
-                        <div class="card" style="background-color: #d0e4f7;">
-                            <div class="card-body text-center">
-
-                                <!-- Nombre y etiqueta de panel -->
-                                <p class="fw-bold mb-0" style="color: #1a5fa8;">Bienvenido</p>
-                                <p class="text-muted small mb-3">Panel principal</p>
-
-                                <!-- Avatar del usuario -->
-                                <img src="{{ url_for('static', filename='images/users/default.png') }}"
-                                     class="rounded-circle mb-3"
-                                     width="70" height="70"
-                                     alt="Avatar">
-
-                                <!-- Nombre del usuario (viene de Flask-Login) -->
-                                <h6 class="mb-1">{{ current_user.name }}</h6>
-
-                                <!-- Número de cuenta bancaria -->
-                                <p class="text-muted small mb-0">Cuenta {{ account.number }}</p>
-
+                <header id="page-topbar">
+                    <div class="navbar-header">
+                        <div class="d-flex">
+                            <div class="navbar-brand-box">
+                        
+                                <a href="index.html" class="logo logo-light">
+                                    <span class="logo-sm">
+                                        <img src="{{ url_for('static', filename='images/site/cheems_bank_logo.png') }}" alt="" height="22">
+                                    </span>
+                                    <span class="logo-lg">
+                                        <img src="{{ url_for('static', filename='images/site/cheems_bank_logo.png') }}" alt="" height="70" style="margin-top:10px">
+                                    </span>
+                                </a>
                             </div>
+
+                            <button type="button" class="btn btn-sm px-3 font-size-16 header-item waves-effect" id="vertical-menu-btn">
+                                <i class="fa fa-fw fa-bars"></i>
+                            </button>
                         </div>
 
-                        <!-- ===== BALANCE ACTUAL ===== -->
-                        <div class="card mt-3">
-                            <div class="card-body">
-                                <p class="text-muted small mb-1">Balance actual</p>
-                                <!-- Muestra en verde si es positivo, rojo si es negativo -->
-                                <h4 class="{% if balance >= 0 %}text-success{% else %}text-danger{% endif %} mb-0">
-                                    ${{ "%.2f"|format(balance) }}
-                                </h4>
-                            </div>
-                        </div>
-
-                    </div>
-                    <!-- ===== FIN TARJETA PERFIL ===== -->
-
-
-                    <!-- ===== TABLA DE MOVIMIENTOS RECIENTES ===== -->
-                    <div class="col-md-9">
-                        <div class="card">
-                            <div class="card-body">
-                                <h5 class="card-title mb-3">Últimos movimientos</h5>
-
-                                <!-- Solo muestra la tabla si hay transacciones registradas -->
-                                {% if transactions %}
-                                <div class="table-responsive">
-                                    <table class="table table-hover align-middle mb-0">
-                                        <thead class="table-light">
-                                            <tr>
-                                                <th>Fecha</th>
-                                                <th>Descripción</th>
-                                                <th>Monto</th>
-                                                <th>Tipo</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <!-- Iteramos cada transacción enviada desde app.py -->
-                                            {% for t in transactions %}
-                                            <tr>
-                                                <!-- Fecha formateada: si es objeto date/datetime, usamos strftime -->
-                                                <td class="text-muted small">
-                                                    {{ t.date.strftime('%Y/%m/%d') if t.date else '—' }}
-                                                </td>
-
-                                                <!-- Descripción de la transacción -->
-                                                <td>{{ t.description }}</td>
-
-                                                <!-- Monto: verde para ingresos, rojo para egresos -->
-                                                <td class="fw-semibold {% if t.type == 1 %}text-success{% else %}text-danger{% endif %}">
-                                                    {% if t.type == 1 %}+{% else %}−{% endif %}
-                                                    ${{ "%.2f"|format(t.amount) }}
-                                                </td>
-
-                                                <!-- Badge de tipo: Ingreso (verde) o Egreso (rojo) -->
-                                                <td>
-                                                    {% if t.type == 1 %}
-                                                        <span class="badge bg-success">Ingreso</span>
-                                                    {% else %}
-                                                        <span class="badge bg-danger">Egreso</span>
-                                                    {% endif %}
-                                                </td>
-                                            </tr>
-                                            {% endfor %}
-                                        </tbody>
-                                    </table>
+                        <div class="d-flex">
+                            <div class="dropdown d-inline-block">
+                                <button type="button" class="btn header-item waves-effect" id="page-header-user-dropdown"
+                                data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <img class="rounded-circle header-profile-user" src="{{ url_for('static', filename='images/users/default.png') }}" alt="Header Avatar">
+                                    <span class="d-none d-xl-inline-block ms-1" key="t-henry">{{ current_user.name }}</span>
+                                    <i class="mdi mdi-chevron-down d-none d-xl-inline-block"></i>
+                                </button>
+                                <div class="dropdown-menu dropdown-menu-end">
+                                    <a class="dropdown-item" href="#"><i class="bx bx-user font-size-16 align-middle me-1"></i> <span key="t-profile">Mi perfil</span></a> 
+                                    <a class="dropdown-item" href="#"><i class="bx bx-key font-size-16 align-middle me-1"></i> <span key="t-lock-screen">Cambiar mi contraseña</span></a>
+                                    <div class="dropdown-divider"></div>
+                                    <a class="dropdown-item text-danger" href="{{ url_for('logout') }}"><i class="bx bx-power-off font-size-16 align-middle me-1 text-danger"></i> <span key="t-logout">Cerrar sesión</span></a>
                                 </div>
-
-                                {% else %}
-                                <!-- Mensaje cuando no hay movimientos aún -->
-                                <p class="text-muted mb-0">No hay movimientos registrados aún.</p>
-                                {% endif %}
-
                             </div>
                         </div>
+                        
+    
+                        </div>
                     </div>
-                    <!-- ===== FIN TABLA DE MOVIMIENTOS ===== -->
+                </header>
 
-                </div>
+                <div class="vertical-menu">
+                    <div data-simplebar class="h-100">
+                        <div id="sidebar-menu">
+                            <ul class="metismenu list-unstyled" id="side-menu">
+                                <li class="menu-title" key="t-menu">Categoría 1</li>
+                                <li>
+                                    <a href="javascript: void(0);" class="has-arrow waves-effect">
+                                        <i class="bx bx-home-circle"></i>
+                                        <span key="t-dashboards">Inicio</span>
+                                    </a>
+                                    <ul class="sub-menu" aria-expanded="false">
+                                        <li><a href="#" key="t-default">Opción 1</a></li>
+                                        <li><a href="#" key="t-saas">Opción 2</a></li>
+                                        <li><a href="#" key="t-crypto">Opción 3</a></li>
+                                    </ul>
+                                </li>
 
-                {% else %}
+                                <li class="menu-title" key="t-apps">Categoría 2</li>
 
-                <!-- ===== SIN CUENTA ASOCIADA ===== -->
-                <!-- Se muestra si el usuario no tiene ninguna cuenta en la BD -->
-                <div class="row">
-                    <div class="col-12">
-                        <div class="card">
-                            <div class="card-body">
-                                <p class="text-muted mb-0">No tienes una cuenta bancaria asociada aún.</p>
-                            </div>
+                                <li>
+                                    <a href="javascript: void(0);" class="has-arrow waves-effect">
+                                        <i class="bx bx-calendar"></i>
+                                        <span key="t-dashboards">Menú 1</span>
+                                    </a>
+                                    <ul class="sub-menu" aria-expanded="false">
+                                        <li><a href="#" key="t-tui-calendar">Opción 1</a></li>
+                                        <li><a href="#" key="t-full-calendar">Opción 2</a></li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <a href="#" class="waves-effect">
+                                        <i class="bx bx-chat"></i>
+                                        <span key="t-chat">Menú 2</span>
+                                    </a>
+                                </li>
+                            </ul>
                         </div>
                     </div>
                 </div>
 
-                {% endif %}
-                <!-- ---- Fin condicional de cuenta ---- -->
+                <div class="main-content">
+
+                    <div class="page-content">
+                        <div class="container-fluid">
+
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                                        <h5 class="mb-sm-0 font-size-24">{{ "Bienvenido, " + current_user.name }}</h5>
+                                        <h5 class="mb-sm-0 font-size-18">CheemsBank - Servicios Financieros Globales</h5>
+
+                                        <div class="page-title-right">
+                                            <ol class="breadcrumb m-0">
+                                                <li class="breadcrumb-item"><a href="javascript: void(0);">Inicio</a></li>
+                                                <li class="breadcrumb-item active">Bienvenido</li>
+                                            </ol>
+                                        </div>
+                                    </div>
+                                </div> 
+                            </div>
+                        </div>  
+                    </div>
+
+
+                    
+                    <!-- Mostrar el numero de cuenta y el saldo actual en la parte superior -->
+                    <!-- con el numero de cuenta a la izquierda y el saldo a la derecha -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5 class="mb-sm-0 font-size-18">Cuenta: {{account.number}}</h5>
+                        </div>
+                        <div class="col-md-6 text-end padding-right-5">
+                            <h5 class="mb-sm-0 font-size-18">Saldo actual</h5>
+                        <h3 > {{balance }}
+                        </div>
+                    </div>
+
+
+                    <!-- Mostrar el historial de movimientos en una tabla debajo del numero de cuenta y el saldo -->
+                    <div>
+                        <h5 class="mb-sm-0 font-size-18">Historial de movimientos</h5>
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Descripción</th>
+                                    <th>Tipo</th>
+                                    <th>Monto</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for transaction in account.transactions %}
+                                <tr>
+                                    <td>{{ transaction.date }}</td>
+                                    <td>{{ transaction.description }}</td>
+                                    <td>{{ transaction.type == 1 and "Ingreso" or "Egreso" }}</td>
+                                    <td class="{{ transaction.type == 1 and 'text-success' or 'text-danger' }}">
+                                        {{ "$%.2f" % transaction.amount }}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+
+
+                    <div class="modal fade transaction-detailModal" tabindex="-1" role="dialog" aria-labelledby="transaction-detailModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="transaction-detailModalLabel">Título de modal</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div> 
+                    
+                    <footer class="footer">
+                        <div class="container-fluid">
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <script>document.write(new Date().getFullYear())</script> CheemsBank - Servicios Financieros Globales
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="text-sm-end d-none d-sm-block">
+                                        Desarrollado por Asheboe
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </footer>
+                </div>
 
             </div>
-        </div>
 
-        <!-- ==================== FOOTER ==================== -->
-        <footer class="footer text-center mt-4">
-            <small>CheemsBank - Desarrollado por Asheboe</small>
-        </footer>
 
-    </div>
-    <!-- ==================== FIN CONTENIDO PRINCIPAL ==================== -->
+            <div class="rightbar-overlay"></div>
 
-</div>
+    <script src="{{ url_for('static', filename='libs/jquery/jquery.min.js') }}"></script>
+            <script src="{{ url_for('static', filename='libs/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+            <script src="{{ url_for('static', filename='libs/metismenu/metisMenu.min.js') }} "></script>
+            <script src="{{ url_for('static', filename='libs/simplebar/simplebar.min.js') }} "></script>
+            <script src="{{ url_for('static', filename='libs/node-waves/waves.min.js') }} "></script>
 
-<!-- ==================== SCRIPTS ==================== -->
-<!-- Orden importante: jQuery primero, luego Bootstrap, luego plugins -->
-<script src="{{ url_for('static', filename='libs/jquery/jquery.min.js') }}"></script>
-<script src="{{ url_for('static', filename='libs/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
-<script src="{{ url_for('static', filename='libs/metismenu/metisMenu.min.js') }}"></script>
-<script src="{{ url_for('static', filename='libs/simplebar/simplebar.min.js') }}"></script>
-<script src="{{ url_for('static', filename='libs/node-waves/waves.min.js') }}"></script>
-<script src="{{ url_for('static', filename='js/app.js') }}"></script>
-
-</body>
+            <script src="{{ url_for('static', filename='js/app.js') }} "></script>
+        </body>
 </html>
