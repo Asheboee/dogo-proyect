@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, jsonify, redirect, url_for
-from entities.accont import Account
+from entities.account import Account
 from entities.log import Log
 from entities.user import User
 from entities.transaction import Transaction
