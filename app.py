@@ -62,9 +62,11 @@ def login():
     password = data.get("password")
 
     user = User.check_login(email, password)
-    if user:
+    if user: 
 
         login_user(user)
+
+        
 
         # Guardar el log de inicio de sesion
         Log.save_log(user, "Inicio de sesion", LogType.LOGIN)
