@@ -1,57 +1,66 @@
 from persistence.db import get_connection
 from werkzeug.security import generate_password_hash, check_password_hash
 from enums.profile import Profile
+from entities.permission import Permission
 import pymysql
 from flask_login import UserMixin
 
+
 class User(UserMixin):
+
+    # ----------------------------------------------------------
+    # Constructor: define los atributos de cada objeto User.
+    # _is_active con guión bajo evita conflicto con la propiedad
+    # is_active de Flask-Login, que sobreescribimos más abajo.
+    # ----------------------------------------------------------
     def __init__(self, id: int, name: str, email: str, password: str,
-        profile: Profile = None, permissions: list = None, is_active: bool = True):
+                 profile: Profile = None, permissions: list = None, is_active: bool = True):
         self.id = id
         self.name = name
         self.email = email
         self.password = password
         self.profile = profile
-        self.permissions = permissions 
+        self.permissions = permissions if permissions is not None else []
         self._is_active = is_active
 
-    def check_email_exists(email) -> bool:
-        """
-            Verifica si la cuenta de correo electrónico ya se encuentra registrada.
+    # ----------------------------------------------------------
+    # Propiedad requerida por Flask-Login.
+    # Retorna True si el usuario puede iniciar sesión,
+    # False si su cuenta está deshabilitada (is_active = 0 en BD).
+    # ----------------------------------------------------------
+    @property
+    def is_active(self):
+        return self._is_active
 
-            Parameters:
-                email (str): Correo electrónico a validar.
 
-            Returns:
-                bool: True si el correo ya se encunetra registrado; de lo contrario, False.
-        """
+    # ----------------------------------------------------------
+    # Verifica si un correo ya existe en la BD antes de registrar.
+    # Retorna True si ya está registrado, False si está disponible.
+    # ----------------------------------------------------------
+    def check_email_exists(email: str) -> bool:
         connection = get_connection()
         cursor = connection.cursor(pymysql.cursors.DictCursor)
-        sql = "SELECT email from user WHERE email = %s"
-        cursor.execute(sql, (email,))
 
+        sql = "SELECT email FROM user WHERE email = %s"
+        cursor.execute(sql, (email,))
         row = cursor.fetchone()
 
         cursor.close()
         connection.close()
         return row is not None
-    
-        
-    def save(name: str, email:str, password:str) -> bool:
-        """
-            Guarda un registro de usuario en la base de datos
 
-            Parameters:
-                name (str): Nombre del usuario.
-                email (str): Correo electrónico del usuario.
-                password (str): Contraseña del usuario en texto plano.
 
-            Returns:
-                bool: True si la cuenta se guardó correctamente; de lo contrario, False.
-        """
+    # ----------------------------------------------------------
+    # Guarda un nuevo usuario en la BD.
+    # Nunca guarda la contraseña en texto plano, siempre como hash.
+    # Retorna True si se guardó bien, False si hubo error.
+    # ----------------------------------------------------------
+    def save(name: str, email: str, password: str) -> bool:
         try:
             connection = get_connection()
             cursor = connection.cursor()
+
+            # Convertimos la contraseña a hash antes de guardar
             hash_password = generate_password_hash(password)
 
             sql = "INSERT INTO user (name, email, password) VALUES (%s, %s, %s)"
@@ -61,62 +70,94 @@ class User(UserMixin):
             cursor.close()
             connection.close()
             return True
+
         except Exception as ex:
-            print(f"Error saving user:{ex}")
+            print(f"Error saving user: {ex}")
             return False
-        
-    def check_login(email, password):
+
+
+    # ----------------------------------------------------------
+    # Verifica las credenciales de login.
+    # CORRECCIONES aplicadas:
+    #   1. Se agregó 'password' a la query SQL (faltaba la coma).
+    #   2. Se corrigió el orden de argumentos al construir User.
+    #   3. Se agregó la carga de permisos con Permission.get_permissions_by_user.
+    # Retorna un objeto User si las credenciales son correctas,
+    # None si el email no existe o la contraseña no coincide.
+    # ----------------------------------------------------------
+    def check_login(email: str, password: str):
         try:
             connection = get_connection()
             cursor = connection.cursor(pymysql.cursors.DictCursor)
-            
 
-            sql = "SELECT id, name, email, profile, is_active password FROM user WHERE email = %s"
+            # CORRECCIÓN 1: Se incluyó 'password' en la query con la coma correcta
+            sql = "SELECT id, name, email, password, profile, is_active FROM user WHERE email = %s"
             cursor.execute(sql, (email,))
-
             user = cursor.fetchone()
-            
+
             cursor.close()
             connection.close()
 
             if user and check_password_hash(user["password"], password):
+                # CORRECCIÓN 2: Se carga la lista de permisos del usuario
+                permissions = Permission.get_permissions_by_user(user["id"])
+
+                # CORRECCIÓN 3: Se corrigió el orden y los argumentos del constructor
                 return User(
                     user["id"],
                     user["name"],
                     user["email"],
+                    "",                  # No guardamos el hash en sesión por seguridad
                     user["profile"],
+                    permissions,
                     user["is_active"]
-
-                    ""
                 )
 
             return None
+
         except Exception as ex:
-            print(f"Error login user:{ex}")
+            print(f"Error login user: {ex}")
             return False
-        
-    def get_by_id(id):
-            try:
-                connection = get_connection()
-                cursor = connection.cursor(pymysql.cursors.DictCursor)
-                
-                sql = "SELECT id, name, email, password FROM user WHERE id = %s"
-                cursor.execute(sql, (id,))
 
-                user = cursor.fetchone()
-                
-                cursor.close()
-                connection.close()
 
-                if user:
-                    return User(
-                        user["id"],
-                        user["name"],
-                        user["email"],
-                        user["password"]
-                    )
+    # ----------------------------------------------------------
+    # Obtiene un usuario por su ID.
+    # Flask-Login llama a este método en cada request para
+    # restaurar la sesión activa del usuario.
+    # CORRECCIONES aplicadas:
+    #   1. Se agregó 'profile' e 'is_active' a la query SQL.
+    #   2. Se cargan los permisos del usuario.
+    #   3. Se pasan todos los campos al constructor de User.
+    # ----------------------------------------------------------
+    def get_by_id(id: int):
+        try:
+            connection = get_connection()
+            cursor = connection.cursor(pymysql.cursors.DictCursor)
 
-                return None
-            except Exception as ex:
-                print(f"Error login user:{ex}")
-                return False
+            # CORRECCIÓN: Se incluyeron profile e is_active en la query
+            sql = "SELECT id, name, email, password, profile, is_active FROM user WHERE id = %s"
+            cursor.execute(sql, (id,))
+            user = cursor.fetchone()
+
+            cursor.close()
+            connection.close()
+
+            if user:
+                # CORRECCIÓN: Se cargan los permisos del usuario
+                permissions = Permission.get_permissions_by_user(user["id"])
+
+                return User(
+                    user["id"],
+                    user["name"],
+                    user["email"],
+                    user["password"],
+                    user["profile"],
+                    permissions,
+                    user["is_active"]
+                )
+
+            return None
+
+        except Exception as ex:
+            print(f"Error get_by_id: {ex}")
+            return False
