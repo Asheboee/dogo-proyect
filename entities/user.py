@@ -19,19 +19,16 @@ class User(UserMixin):
         # Convertimos explícitamente a bool por si la BD retorna 0 o 1 como entero
         self._is_active = bool(is_active)
 
-    # Flask-Login usa esta propiedad para saber si el usuario puede iniciar sesión
+    # Flask-Login usa esta propiedad para saber si el usuario puede iniciar sesion
     @property
     def is_active(self):
         return self._is_active
 
-    # Flask-Login usa esta propiedad para identificar al usuario en la sesión
+    # Flask-Login usa esta propiedad para identificar al usuario en la sesion
     def get_id(self):
         return str(self.id)
 
-
-    # ----------------------------------------------------------
-    # Verifica si un correo ya existe en la BD antes de registrar.
-    # ----------------------------------------------------------
+    # Verifica si un correo ya existe en la BD antes de registrar
     def check_email_exists(email: str) -> bool:
         connection = get_connection()
         cursor = connection.cursor(pymysql.cursors.DictCursor)
@@ -44,10 +41,7 @@ class User(UserMixin):
         connection.close()
         return row is not None
 
-
-    # ----------------------------------------------------------
-    # Guarda un nuevo usuario en la BD con contraseña hasheada.
-    # ----------------------------------------------------------
+    # Guarda un nuevo usuario en la BD con contraseña hasheada
     def save(name: str, email: str, password: str) -> bool:
         try:
             connection = get_connection()
@@ -68,10 +62,8 @@ class User(UserMixin):
             return False
 
 
-    # ----------------------------------------------------------
-    # Verifica las credenciales de login.
-    # Retorna un objeto User si son correctas, None si no.
-    # ----------------------------------------------------------
+    # Verifica las credenciales de login
+    # Retorna un objeto User si son correctas, None si no
     def check_login(email: str, password: str):
         try:
             connection = get_connection()
@@ -103,11 +95,9 @@ class User(UserMixin):
             return False
 
 
-    # ----------------------------------------------------------
-    # Obtiene un usuario por su ID.
-    # Flask-Login llama a este método en cada request para
-    # restaurar la sesión activa del usuario.
-    # ----------------------------------------------------------
+    # Obtiene un usuario por su ID
+    # Flask-Login llama a este metodo en cada request para
+    # restaurar la sesion activa del usuario
     def get_by_id(id: int):
         try:
             connection = get_connection()
@@ -129,7 +119,7 @@ class User(UserMixin):
                     user["password"],
                     user["profile"],
                     permissions,
-                    bool(user["is_active"])  # Conversión explícita a bool
+                    bool(user["is_active"])  # Conversion explicita a bool
                 )
 
             return None
