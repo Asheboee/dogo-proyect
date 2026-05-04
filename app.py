@@ -7,7 +7,7 @@ from flask_login import LoginManager, current_user, login_user, login_required, 
 from dotenv import load_dotenv
 import os
 from decimal import Decimal
-
+from enums.value_permission import ValuePermission
 from enums.log_type import LogType
 
 load_dotenv()
@@ -53,6 +53,17 @@ def create_user():
         return jsonify({"success": True, "message": "Su cuenta fue creada correctamente."}), 201
     else:
         return jsonify({"success": False, "message": "Ocurrió un error al crear su cuenta. Intente de nuevo"}), 500
+    
+@app.route('/account', methods=["GET"])
+@login_required
+def account():
+    # Verificamos si el usuario tiene el permiso ACCOUNT (value = 3)
+    has_permission = any(p.value == ValuePermission.ACCOUNT.value for p in current_user.permissions)
+
+    if not has_permission:
+        return jsonify({"success": False, "message": "No tienes permiso para acceder a esta sección."}), 403
+
+    return jsonify({"success": True, "message": f"Bienvenido a la sección de cuentas, {current_user.name}"}), 200
 
 @app.route('/api/login', methods=['POST'])
 def login():
