@@ -21,10 +21,7 @@ login_manager.login_view = "index"
 
 @login_manager.user_loader
 def load_user(id_user):
-    print(f">>> load_user llamado con id: {id_user}")
-    user = User.get_by_id(id_user)
-    print(f">>> Usuario cargado: {user}")
-    return user
+    return User.get_by_id(id_user)
 
 @app.route('/')
 def index():
@@ -37,11 +34,9 @@ def signup():
 @app.route('/welcome', methods=["GET"])
 @login_required
 def welcome():
-    print(f">>> Entrando a welcome, usuario: {current_user}")
     account = Account.get_account_by_user(current_user.id)
-    print(f">>> Account: {account}")
     balance = Account.calculate_balance(account)
-    return render_template("welcome.html", account=account, balance=balance)
+    return render_template("welcome.html", account = account, balance = balance)
 
 @app.route('/api/users', methods=["POST"])
 def create_user():
