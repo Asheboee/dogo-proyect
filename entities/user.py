@@ -16,7 +16,7 @@ class User(UserMixin):
         self.password = password
         self.profile = profile
         self.permissions = permissions if permissions is not None else []
-        # Convertimos explícitamente a bool por si la BD retorna 0 o 1 como entero
+        # Convertimos explicitamente a bool por si la BD retorna 0 o 1 como entero
         self._is_active = bool(is_active)
 
     # Flask-Login usa esta propiedad para saber si el usuario puede iniciar sesion
@@ -119,7 +119,7 @@ class User(UserMixin):
                     user["password"],
                     user["profile"],
                     permissions,
-                    bool(user["is_active"])  # Conversion explicita a bool
+                    bool(user["is_active"])  # se convierte a bool 
                 )
 
             return None
