@@ -32,7 +32,6 @@ def signup():
     return render_template("signup.html")
 
 @app.route('/welcome', methods=["GET"])
-@login_required
 def welcome():
     account = Account.get_account_by_user(current_user.id)
     balance = Account.calculate_balance(account)
@@ -55,7 +54,6 @@ def create_user():
         return jsonify({"success": False, "message": "Ocurrió un error al crear su cuenta. Intente de nuevo"}), 500
     
 @app.route('/account', methods=["GET"])
-@login_required
 def account():
     # Verificamos si el usuario tiene el permiso ACCOUNT (value = 3)
     has_permission = any(p.value == ValuePermission.ACCOUNT.value for p in current_user.permissions)

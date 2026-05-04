@@ -82,10 +82,10 @@ class User(UserMixin):
                     user["id"],
                     user["name"],
                     user["email"],
-                    "",                  # No guardamos el hash en sesion por seguridad
+                    "",                  # No se guarda el hash 
                     user["profile"],
                     permissions,
-                    bool(user["is_active"])  # Conversión explicita a bool
+                    bool(user["is_active"]) 
                 )
 
             return None

@@ -5,7 +5,7 @@ import pymysql
 
 class Permission:
     # Constructor: cada permiso tiene un ID y un valor
-    # que corresponde a un elemento del enum ValuePermission
+    # que vien del enum ValuePermission
     def __init__(self, id: int, value: ValuePermission):
         self.id = id
         self.value = value
