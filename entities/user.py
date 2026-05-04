@@ -77,15 +77,15 @@ class User(UserMixin):
             connection.close()
 
             if user and check_password_hash(user["password"], password):
-                permissions = Permission.get_permissions_by_user(user["id"])
+                permissions = Permission.get_permissions_by_user(user["id"]) #hablamos a user-permission desde la clase permission 
                 return User(
                     user["id"],
                     user["name"],
                     user["email"],
-                    "",                  # No guardamos el hash en sesión por seguridad
+                    "",                  # No guardamos el hash en sesion por seguridad
                     user["profile"],
                     permissions,
-                    bool(user["is_active"])  # Conversión explícita a bool
+                    bool(user["is_active"])  # Conversión explicita a bool
                 )
 
             return None
